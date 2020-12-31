@@ -65,7 +65,7 @@ class Achievement {
         // 排序
         var res = Object.keys(this.ach).sort(function (a, b) { return new Date(a) - new Date(b) });
         for (var key in res) {
-            output += key + "\n  " + res[key].join("\n  ");
+            output += res[key] + "\n  " + this.ach[res[key]].join("\n  ") + "\n";
         }
         return output;
     }
@@ -84,7 +84,7 @@ class Mode {
         }).sort((a, b) => a.date - b.date);
         this.newestLine = this.lines[this.lines.length - 1];
         this.oldestLine = this.lines[0]
-        this.dEntireLine = new DeltaLine(this.newestLine, this.oldestLine);
+        this.dEntireLine = new DeltaLine(this.lines.length - 1, this.newestLine, this.oldestLine);
         // 注意，dLines的index总是比lines小1
         this.dLines = this.lines.map((line, index) => {
             if (index <= 0) return undefined;
@@ -110,7 +110,7 @@ class Mode {
         if (maxContinuousPlayingEndDay === utils.getDateString(this.newestLine.date))
             this.achievement.addAchieve(maxContinuousPlayingEndDay, "到此为止，您已经坚持" + maxContinuousPlayingDays + "天连续游玩osu，并且可能还要继续下去...");
         else
-            this.achievement.addAchieve(maxContinuousPlayingEndDay, "可能是太过忙碌，可能是出门在外，也可能只是忘记了，您结束了为期" + maxContinuousPlayingDays + "天的连续osu生活");
+            this.achievement.addAchieve(maxContinuousPlayingEndDay, "您中断了为期" + maxContinuousPlayingDays + "天的连续osu生活QAQ");
     }
 
 
@@ -137,7 +137,7 @@ class Mode {
             if (dline.dSS > maxIncreaseSSValue) {
                 maxIncreaseSSValue = dline.dSS;
                 maxIncreaseSSEnd = utils.getDateString(dline.date);
-                if (dline.oldLine.SS <= 0) this.achievement.addAchieve(utils.getDateString(dline.date), "这天，您获得了人生中该模式的第一个SS！您一定非常激动吧");
+                if (dline.oldLine.SS <= 0) this.achievement.addAchieve(utils.getDateString(dline.date), "这天，您获得了人生中该模式的第一个SS！");
             }
             if (dline.dPlaycount > maxIncreasePCValue) {
                 maxIncreasePCValue = dline.dPlaycount;
@@ -152,20 +152,20 @@ class Mode {
                 maxDecreasePPEnd = utils.getDateString(dline.date);
             }
             if (dline.dAccuracy > maxIncreaseAccValue) {
-                maxIncreaseAccValue = dline.dPP;
+                maxIncreaseAccValue = dline.dAccuracy;
                 maxIncreaseAccEnd = utils.getDateString(dline.date);
             }
             if (dline.dAccuracy < maxDecreaseAccValue) {
-                maxDecreaseAccValue = dline.dPP;
+                maxDecreaseAccValue = dline.dAccuracy;
                 maxDecreaseAccEnd = utils.getDateString(dline.date);
             }
         });
-        if (maxIncreaseSSValue > 0) this.achievement.addAchieve(utils.getDateString(maxIncreaseSSEnd), "这天您刷了" + maxIncreaseSSValue + "个SS！");
-        if (maxIncreasePCValue > 0) this.achievement.addAchieve(utils.getDateString(maxIncreasePCEnd), "这天您打了" + maxIncreasePCValue + " PC！");
-        if (maxIncreasePPValue > 0) this.achievement.addAchieve(utils.getDateString(maxIncreasePPEnd), "这天您增加了" + maxIncreasePPValue + " PP！");
-        if (maxDecreasePPValue < 0) this.achievement.addAchieve(utils.getDateString(maxDecreasePPEnd), "这天您倒刷了" + maxDecreasePPValue + " PP...");
-        if (maxIncreaseAccValue > 0) this.achievement.addAchieve(utils.getDateString(maxIncreaseAccEnd), "这天您提升了" + maxIncreaseAccValue + "%acc！");
-        if (maxDecreaseAccValue < 0) this.achievement.addAchieve(utils.getDateString(maxDecreaseAccEnd), "这天您降低了" + maxDecreaseAccValue + "%acc...");
+        if (maxIncreaseSSValue > 0) this.achievement.addAchieve(maxIncreaseSSEnd, "这天您刷了" + maxIncreaseSSValue + "个SS！");
+        if (maxIncreasePCValue > 99) this.achievement.addAchieve(maxIncreasePCEnd, "这天您打了" + maxIncreasePCValue + " PC！");
+        if (maxIncreasePPValue > 10) this.achievement.addAchieve(maxIncreasePPEnd, "这天您增加了" + maxIncreasePPValue + " PP！");
+        if (maxDecreasePPValue < 0) this.achievement.addAchieve(maxDecreasePPEnd, "这天您倒刷了" + (- maxDecreasePPValue) + " PP（也可能是pp系统调整）");
+        if (maxIncreaseAccValue > 0.1) this.achievement.addAchieve(maxIncreaseAccEnd, "这天您提升了" + maxIncreaseAccValue.toFixed(2) + "%acc！");
+        if (maxDecreaseAccValue < -0.1) this.achievement.addAchieve(maxDecreaseAccEnd, "这天您降低了" + (- maxDecreaseAccValue).toFixed(2) + "%acc...");
     }
 
     getPPStepDate() {
@@ -178,6 +178,17 @@ class Mode {
         });
     }
 
+    getRankStepDate() {
+        let aimRankStep = parseInt(Math.log10(this.oldestLine.rankworld)) - 1;
+        this.lines.map((line) => {
+            let dg = parseInt(Math.log10(this.oldestLine.rankworld));
+            if (dg <= aimRankStep) {
+                this.achievement.addAchieve(utils.getDateString(line.date), "这天，您终于进入了" + (dg + 1) + "位数");
+                aimRankStep = dg;
+            }
+        });
+    }
+
     summary() {
         // 先遍历一遍DeltaLine，获取最长连续游玩天数
         this.getMaxContinuousPlaying();
@@ -185,7 +196,9 @@ class Mode {
         this.getMaxIncrease();
         // 再遍历一遍Line，获取跨越整千pp时间
         this.getPPStepDate();
-        
+        // 再遍历一遍Line，获取rank进位时间
+        this.getRankStepDate();
+
         return this.achievement.toString();
     }
 

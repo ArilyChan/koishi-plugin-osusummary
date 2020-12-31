@@ -42,7 +42,8 @@ class getUserData {
     async getUserFull(startDate, endDate) {
         const user = await OsudailyApi.getUserFull(this.options, this.host, this.apiKey);
         if (user.error) throw user.error + "\n" + utils.apiObjectToString(this.options) + "\n可能该用户尚未注册osudaily.net账号";
-        if (user.modes[0].lines.length < 10) throw "该用户数据量不足QAQ";
+        let gamemode = this.options.m || 0;
+        if (user.modes[gamemode].lines.length < 10) throw "该用户数据量不足QAQ";
         let userObject = new UserFull(user, startDate, endDate);
         return userObject;
     }
