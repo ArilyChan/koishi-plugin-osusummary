@@ -1,13 +1,11 @@
-"use strict";
+const OsuSummary = require("./index").OsuSummary;
 
-const osudailyQuery = require("./index").osuSummary;
-
-let psq = new osudailyQuery({
+const psq = new OsuSummary({
     apiKey: require("./apiToken.json").apiToken
-})
+});
 
 
-let myQQ = 1;
+const myQQ = 1;
 const readline = require("readline");
 const rl = readline.createInterface({
     input: process.stdin,

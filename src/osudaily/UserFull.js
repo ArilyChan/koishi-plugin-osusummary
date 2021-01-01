@@ -1,6 +1,4 @@
-"use strict";
-
-const utils = require("./utils");
+const utils = require("../utils");
 
 class Line {
     constructor(lineData) {
@@ -28,8 +26,8 @@ class Line {
 class DeltaLine {
     /**
      * @param {Number} index newLine所在lines的index
-     * @param {Line} newLine 
-     * @param {Line} oldLine 
+     * @param {Line} newLine
+     * @param {Line} oldLine
      */
     constructor(index, newLine, oldLine) {
         this.index = index;
@@ -63,8 +61,9 @@ class Achievement {
     toString() {
         let output = "";
         // 排序
-        var res = Object.keys(this.ach).sort(function (a, b) { return new Date(a) - new Date(b) });
-        for (var key in res) {
+        const res = Object.keys(this.ach).sort((a, b) => { return new Date(a) - new Date(b) });
+        // eslint-disable-next-line guard-for-in
+        for (const key in res) {
             output += res[key] + "\n  " + this.ach[res[key]].join("\n  ") + "\n";
         }
         return output;
@@ -73,9 +72,9 @@ class Achievement {
 
 class Mode {
     /**
-     * @param {*} data 
-     * @param {Date} startDate 
-     * @param {Date} endDate 
+     * @param {*} data
+     * @param {Date} startDate
+     * @param {Date} endDate
      */
     constructor(data, startDate, endDate) {
         this.mode = data.mode;
@@ -83,12 +82,12 @@ class Mode {
             return (startDate <= line.date && line.date <= endDate);
         }).sort((a, b) => a.date - b.date);
         this.newestLine = this.lines[this.lines.length - 1];
-        this.oldestLine = this.lines[0]
+        this.oldestLine = this.lines[0];
         this.dEntireLine = new DeltaLine(this.lines.length - 1, this.newestLine, this.oldestLine);
         // 注意，dLines的index总是比lines小1
         this.dLines = this.lines.map((line, index) => {
-            if (index <= 0) return undefined;
-            else return new DeltaLine(index, line, this.lines[index - 1]);
+            if (index <= 0) return null;
+            return new DeltaLine(index, line, this.lines[index - 1]);
         }).slice(1);
         this.achievement = new Achievement();
     }
@@ -97,6 +96,7 @@ class Mode {
         let maxContinuousPlayingDays = 0;
         let nowContinuousPlayingDays = 0;
         let maxContinuousPlayingEndDay = "";
+        // eslint-disable-next-line array-callback-return
         this.dLines.map((dline, index) => {
             if (dline.dPlaycount > 0 && index < this.dLines.length - 1) nowContinuousPlayingDays += 1;
             else {
@@ -107,10 +107,8 @@ class Mode {
                 nowContinuousPlayingDays = 0;
             }
         });
-        if (maxContinuousPlayingEndDay === utils.getDateString(this.newestLine.date))
-            this.achievement.addAchieve(maxContinuousPlayingEndDay, "到此为止，您已经坚持" + maxContinuousPlayingDays + "天连续游玩osu，并且可能还要继续下去...");
-        else
-            this.achievement.addAchieve(maxContinuousPlayingEndDay, "您中断了为期" + maxContinuousPlayingDays + "天的连续osu生活QAQ");
+        if (maxContinuousPlayingEndDay === utils.getDateString(this.newestLine.date)) this.achievement.addAchieve(maxContinuousPlayingEndDay, "到此为止，您已经坚持" + maxContinuousPlayingDays + "天连续游玩osu，并且可能还要继续下去...");
+        else this.achievement.addAchieve(maxContinuousPlayingEndDay, "您中断了为期" + maxContinuousPlayingDays + "天的连续osu生活QAQ");
     }
 
 
@@ -133,6 +131,7 @@ class Mode {
         // acc倒退最多
         let maxDecreaseAccValue = 0;
         let maxDecreaseAccEnd = "";
+        // eslint-disable-next-line array-callback-return
         this.dLines.map((dline) => {
             if (dline.dSS > maxIncreaseSSValue) {
                 maxIncreaseSSValue = dline.dSS;
@@ -163,13 +162,14 @@ class Mode {
         if (maxIncreaseSSValue > 0) this.achievement.addAchieve(maxIncreaseSSEnd, "这天您刷了" + maxIncreaseSSValue + "个SS！");
         if (maxIncreasePCValue > 99) this.achievement.addAchieve(maxIncreasePCEnd, "这天您打了" + maxIncreasePCValue + " PC！");
         if (maxIncreasePPValue > 10) this.achievement.addAchieve(maxIncreasePPEnd, "这天您增加了" + maxIncreasePPValue + " PP！");
-        if (maxDecreasePPValue < 0) this.achievement.addAchieve(maxDecreasePPEnd, "这天您倒刷了" + (- maxDecreasePPValue) + " PP（也可能是pp系统调整）");
+        if (maxDecreasePPValue < 0) this.achievement.addAchieve(maxDecreasePPEnd, "这天您倒刷了" + (-maxDecreasePPValue) + " PP（也可能是pp系统调整）");
         if (maxIncreaseAccValue > 0.1) this.achievement.addAchieve(maxIncreaseAccEnd, "这天您提升了" + maxIncreaseAccValue.toFixed(2) + "%acc！");
-        if (maxDecreaseAccValue < -0.1) this.achievement.addAchieve(maxDecreaseAccEnd, "这天您降低了" + (- maxDecreaseAccValue).toFixed(2) + "%acc...");
+        if (maxDecreaseAccValue < -0.1) this.achievement.addAchieve(maxDecreaseAccEnd, "这天您降低了" + (-maxDecreaseAccValue).toFixed(2) + "%acc...");
     }
 
     getPPStepDate() {
         let aimPPStep = parseInt(this.oldestLine.pp / 1000) + 1;
+        // eslint-disable-next-line array-callback-return
         this.lines.map((line) => {
             if (parseInt(line.pp / 1000) >= aimPPStep) {
                 this.achievement.addAchieve(utils.getDateString(line.date), "这天，您的pp终于超过了" + parseInt(line.pp / 1000) * 1000);
@@ -180,8 +180,9 @@ class Mode {
 
     getRankStepDate() {
         let aimRankStep = parseInt(Math.log10(this.oldestLine.rankworld)) - 1;
+        // eslint-disable-next-line array-callback-return
         this.lines.map((line) => {
-            let dg = parseInt(Math.log10(this.oldestLine.rankworld));
+            const dg = parseInt(Math.log10(this.oldestLine.rankworld));
             if (dg <= aimRankStep) {
                 this.achievement.addAchieve(utils.getDateString(line.date), "这天，您终于进入了" + (dg + 1) + "位数");
                 aimRankStep = dg;

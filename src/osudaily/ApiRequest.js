@@ -1,17 +1,27 @@
-"use strict";
-
-const querystring = require('querystring');
-const fetch = require('node-fetch')
+const querystring = require("querystring");
+const fetch = require("node-fetch");
 
 class OsuApi {
-    static async apiCall(_path, _data, _host) {
+    static async apiCall(_path, _data, _host, times = 0) {
+        const MAX_RETRY = 2;
         try {
             const contents = querystring.stringify(_data);
-            const url = "https://" + _host + "/api" + _path + '?' + contents;
-            return await fetch(url).then(res => res.json());
+            const url = "https://" + _host + "/api" + _path + "?" + contents;
+            // console.log(url);
+            const data = await fetch(url, {
+                method: "GET",
+                headers: { "Content-Type": "application/octet-stream" },
+                credentials: "include",
+                timeout: 10000,
+            }).then((res) => res.json());
+            return data;
         }
         catch (ex) {
-            throw "获取数据失败，可能服务器正在维护";
+            if (times >= MAX_RETRY) {
+                throw "从osudaily获取数据失败，可能服务器正在维护";
+            }
+            console.log("获取失败，第" + (times + 1) + "次重试");
+            return this.apiCall(_path, _data, _host, times + 1);
         }
     }
 
@@ -27,7 +37,7 @@ class OsuApi {
     static async getUserFull(options, host, apiKey) {
         options.min = 0;
         options.k = apiKey;
-        const resp = await this.apiCall('/user', options, host);
+        const resp = await this.apiCall("/user", options, host);
         return resp;
     }
 
