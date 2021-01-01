@@ -175,9 +175,9 @@ class Mode {
                 maxDecreaseAccEnd = utils.getDateString(dline.date);
             }
         });
-        if (maxIncreaseAValue > 0) this.achievement.addAchieve(maxIncreaseAEnd, "这天您刷了" + maxIncreaseAValue + "个SS！");
-        if (maxIncreaseSValue > 0) this.achievement.addAchieve(maxIncreaseSEnd, "这天您刷了" + maxIncreaseSValue + "个SS！");
-        if (maxIncreaseSSValue > 0) this.achievement.addAchieve(maxIncreaseSSEnd, "这天您刷了" + maxIncreaseSSValue + "个SS！");
+        if (maxIncreaseAValue > 0) this.achievement.addAchieve(maxIncreaseAEnd, "这天您挖了" + maxIncreaseAValue + "个A坑");
+        if (maxIncreaseSValue > 0) this.achievement.addAchieve(maxIncreaseSEnd, "这天您打了" + maxIncreaseSValue + "个S！");
+        if (maxIncreaseSSValue > 0) this.achievement.addAchieve(maxIncreaseSSEnd, "这天您打了" + maxIncreaseSSValue + "个SS！");
         if (maxIncreasePCValue > 99) this.achievement.addAchieve(maxIncreasePCEnd, "这天您打了" + maxIncreasePCValue + " PC！");
         if (maxIncreasePPValue > 10) this.achievement.addAchieve(maxIncreasePPEnd, "这天您增加了" + maxIncreasePPValue + " PP！");
         if (maxDecreasePPValue < 0) this.achievement.addAchieve(maxDecreasePPEnd, "这天您倒刷了" + (-maxDecreasePPValue) + " PP（也可能是pp系统调整）");
