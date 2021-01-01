@@ -113,6 +113,12 @@ class Mode {
 
 
     getMaxIncrease() {
+        // A增长最多
+        let maxIncreaseAValue = 0;
+        let maxIncreaseAEnd = "";
+        // S增长最多
+        let maxIncreaseSValue = 0;
+        let maxIncreaseSEnd = "";
         // SS增长最多
         let maxIncreaseSSValue = 0;
         let maxIncreaseSSEnd = "";
@@ -133,6 +139,16 @@ class Mode {
         let maxDecreaseAccEnd = "";
         // eslint-disable-next-line array-callback-return
         this.dLines.map((dline) => {
+            if (dline.dA > maxIncreaseAValue) {
+                maxIncreaseAValue = dline.dA;
+                maxIncreaseAEnd = utils.getDateString(dline.date);
+                if (dline.oldLine.A <= 0) this.achievement.addAchieve(utils.getDateString(dline.date), "这天，您获得了人生中该模式的第一个A！");
+            }
+            if (dline.dS > maxIncreaseSValue) {
+                maxIncreaseSValue = dline.dS;
+                maxIncreaseSEnd = utils.getDateString(dline.date);
+                if (dline.oldLine.S <= 0) this.achievement.addAchieve(utils.getDateString(dline.date), "这天，您获得了人生中该模式的第一个S！");
+            }
             if (dline.dSS > maxIncreaseSSValue) {
                 maxIncreaseSSValue = dline.dSS;
                 maxIncreaseSSEnd = utils.getDateString(dline.date);
@@ -159,12 +175,14 @@ class Mode {
                 maxDecreaseAccEnd = utils.getDateString(dline.date);
             }
         });
+        if (maxIncreaseAValue > 0) this.achievement.addAchieve(maxIncreaseAEnd, "这天您刷了" + maxIncreaseAValue + "个SS！");
+        if (maxIncreaseSValue > 0) this.achievement.addAchieve(maxIncreaseSEnd, "这天您刷了" + maxIncreaseSValue + "个SS！");
         if (maxIncreaseSSValue > 0) this.achievement.addAchieve(maxIncreaseSSEnd, "这天您刷了" + maxIncreaseSSValue + "个SS！");
         if (maxIncreasePCValue > 99) this.achievement.addAchieve(maxIncreasePCEnd, "这天您打了" + maxIncreasePCValue + " PC！");
         if (maxIncreasePPValue > 10) this.achievement.addAchieve(maxIncreasePPEnd, "这天您增加了" + maxIncreasePPValue + " PP！");
         if (maxDecreasePPValue < 0) this.achievement.addAchieve(maxDecreasePPEnd, "这天您倒刷了" + (-maxDecreasePPValue) + " PP（也可能是pp系统调整）");
-        if (maxIncreaseAccValue > 0.1) this.achievement.addAchieve(maxIncreaseAccEnd, "这天您提升了" + maxIncreaseAccValue.toFixed(2) + "%acc！");
-        if (maxDecreaseAccValue < -0.1) this.achievement.addAchieve(maxDecreaseAccEnd, "这天您降低了" + (-maxDecreaseAccValue).toFixed(2) + "%acc...");
+        if (maxIncreaseAccValue > 0.3) this.achievement.addAchieve(maxIncreaseAccEnd, "这天您提升了" + maxIncreaseAccValue.toFixed(2) + "%acc！");
+        if (maxDecreaseAccValue < -0.3) this.achievement.addAchieve(maxDecreaseAccEnd, "这天您降低了" + (-maxDecreaseAccValue).toFixed(2) + "%acc...");
     }
 
     getPPStepDate() {
