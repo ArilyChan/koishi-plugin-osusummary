@@ -161,7 +161,7 @@ class UserFull {
         });
         if (maxIncreaseSSValue > 0) this.achievement.addAchieve(maxIncreaseSSEnd, "这天您刷了" + maxIncreaseSSValue + "个SS！");
         if (maxIncreasePCValue > 99) this.achievement.addAchieve(maxIncreasePCEnd, "这天您打了" + maxIncreasePCValue + " PC！");
-        if (maxIncreasePCValue > 999) this.achievement.addAchieve(maxIncreaseTTHEnd, "这天您打了" + maxIncreaseTTHValue + "下！");
+        if (maxIncreaseTTHValue > 999) this.achievement.addAchieve(maxIncreaseTTHEnd, "这天您打了" + maxIncreaseTTHValue + "下！");
         if (maxIncreasePPValue > 10) this.achievement.addAchieve(maxIncreasePPEnd, "这天您增加了" + maxIncreasePPValue + " PP！");
         if (maxDecreasePPValue < 0) this.achievement.addAchieve(maxDecreasePPEnd, "这天您倒刷了" + (-maxDecreasePPValue) + " PP（也可能是pp系统调整）");
         if (maxIncreaseAccValue > 0.1) this.achievement.addAchieve(maxIncreaseAccEnd, "这天您提升了" + maxIncreaseAccValue.toFixed(2) + "%acc！");
