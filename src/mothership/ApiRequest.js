@@ -6,7 +6,7 @@ class OsuApi {
     static async apiCall(url, times = 0) {
         const MAX_RETRY = 10;
         try {
-            console.log(url);
+            // console.log(url);
             const data = await fetch(url, {
                 method: "GET",
                 headers: { "Content-Type": "application/octet-stream" },
